@@ -1,0 +1,376 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ThivashGram - Search</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #0b0c10;
+            color: #ffffff;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* --- DESKTOP SIDEBAR --- */
+        .sidebar {
+            width: 250px;
+            background-color: #12131c;
+            border-right: 1px solid #1f2029;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 10;
+        }
+
+        .brand-logo {
+            font-size: 2rem;
+            font-weight: bold;
+            font-style: italic;
+            background: linear-gradient(45deg, #f72585, #7209b7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 40px;
+            padding-left: 10px;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 15px;
+            color: #a5a7b4;
+            text-decoration: none;
+            font-size: 1.05rem;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background-color: #1c1d27;
+            color: #f72585;
+        }
+
+        .nav-item i {
+            font-size: 1.2rem;
+            width: 25px;
+        }
+
+        .logout-btn {
+            margin-top: auto;
+            color: #f72585;
+            cursor: pointer;
+        }
+
+        /* --- MAIN CONTENT AREA --- */
+        .main-content {
+            margin-left: 250px;
+            flex: 1;
+            padding: 30px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .search-container {
+            width: 100%;
+            max-width: 750px;
+        }
+
+        /* --- NEON SEARCH BAR --- */
+        .search-box-wrapper {
+            position: relative;
+            margin-bottom: 30px;
+            width: 100%;
+        }
+
+        .search-box-wrapper i {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #7d7f8a;
+            font-size: 1.1rem;
+        }
+
+        .search-input {
+            width: 100%;
+            background-color: #12131c;
+            border: 1px solid #1f2029;
+            border-radius: 30px;
+            padding: 15px 15px 15px 50px;
+            color: #ffffff;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .search-input:focus {
+            border-color: #7209b7;
+            box-shadow: 0 0 10px rgba(114, 9, 183, 0.2);
+        }
+
+        /* --- EXPLORE GRID LAYOUT --- */
+        .explore-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #a5a7b4;
+            margin-bottom: 15px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .explore-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+        }
+
+        .explore-item {
+            position: relative;
+            aspect-ratio: 1 / 1;
+            background-color: #12131c;
+            overflow: hidden;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        /* Making some grid items larger for a cool layout vibe like Insta */
+        .explore-item.tall {
+            grid-row: span 2;
+            aspect-ratio: auto;
+            height: 100%;
+        }
+
+        .explore-item img, .explore-item video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+
+        .explore-item:hover img, .explore-item:hover video {
+            transform: scale(1.03);
+        }
+
+        /* Video Icon Indicator */
+        .video-indicator {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            color: #ffffff;
+            font-size: 1.1rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            z-index: 2;
+        }
+
+        /* Hover Details Overlay */
+        .explore-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            color: white;
+            font-weight: 600;
+            z-index: 3;
+        }
+
+        .explore-item:hover .explore-overlay {
+            opacity: 1;
+        }
+
+        /* --- MOBILE BOTTOM NAV --- */
+        .bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #12131c;
+            border-top: 1px solid #1f2029;
+            justify-content: space-around;
+            padding: 12px 0;
+            z-index: 100;
+        }
+
+        .bottom-nav a {
+            color: #a5a7b4;
+            font-size: 1.3rem;
+            text-decoration: none;
+        }
+
+        .bottom-nav a.active {
+            color: #f72585;
+        }
+
+        /* --- RESPONSIVE DESIGN --- */
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            .main-content {
+                margin-left: 0;
+                padding: 15px;
+                padding-bottom: 80px;
+            }
+            .bottom-nav {
+                display: flex;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <div class="brand-logo">ThivashGram</div>
+        <ul class="nav-links">
+            <li><a href="feed.html" class="nav-item"><i class="fa-solid fa-house"></i> Home Feed</a></li>
+            <li><a href="search.html" class="nav-item active"><i class="fa-solid fa-magnifying-glass"></i> Search</a></li>
+            <li><a href="reels.html" class="nav-item"><i class="fa-solid fa-clapperboard"></i> Reels</a></li>
+            <li><a href="messages.html" class="nav-item"><i class="fa-solid fa-paper-plane"></i> Messages</a></li>
+            <li><a href="notifications.html" class="nav-item"><i class="fa-solid fa-heart"></i> Notifications</a></li>
+            <li><a href="upload.html" class="nav-item"><i class="fa-solid fa-square-plus"></i> Create Post</a></li>
+            <li><a href="profile.html" class="nav-item"><i class="fa-solid fa-user"></i> Profile</a></li>
+            <li><a href="settings.html" class="nav-item"><i class="fa-solid fa-gear"></i> Settings</a></li>
+            <li><a onclick="logoutUser()" class="nav-item logout-btn"><i class="fa-solid fa-right-from-bracket"></i> Log Out</a></li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        <div class="search-container">
+            
+            <div class="search-box-wrapper">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" class="search-input" id="search-query" placeholder="Search creators, hashtags, or trends..." onkeyup="executeSearch(event)">
+            </div>
+
+            <div class="explore-title">Trending Post Recommendations</div>
+
+            <div class="explore-grid">
+                
+                <div class="explore-item">
+                    <img src="https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=500&auto=format&fit=crop" alt="Explore">
+                    <div class="explore-overlay">
+                        <span><i class="fa-solid fa-heart"></i> 4.5K</span>
+                    </div>
+                </div>
+
+                <div class="explore-item">
+                    <div class="video-indicator"><i class="fa-solid fa-clapperboard"></i></div>
+                    <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=500&auto=format&fit=crop" alt="Explore">
+                    <div class="explore-overlay">
+                        <span><i class="fa-solid fa-play"></i> 12.1K</span>
+                    </div>
+                </div>
+
+                <div class="explore-item">
+                    <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=500&auto=format&fit=crop" alt="Explore">
+                    <div class="explore-overlay">
+                        <span><i class="fa-solid fa-heart"></i> 2.1K</span>
+                    </div>
+                </div>
+
+                <div class="explore-item tall">
+                    <img src="https://images.unsplash.com/photo-1502082553048-f009c37129b9?q=80&w=500&auto=format&fit=crop" alt="Explore">
+                    <div class="explore-overlay">
+                        <span><i class="fa-solid fa-heart"></i> 8.9K</span>
+                    </div>
+                </div>
+
+                <div class="explore-item">
+                    <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=500&auto=format&fit=crop" alt="Explore">
+                    <div class="explore-overlay">
+                        <span><i class="fa-solid fa-heart"></i> 1.4K</span>
+                    </div>
+                </div>
+
+                <div class="explore-item">
+                    <div class="video-indicator"><i class="fa-solid fa-clapperboard"></i></div>
+                    <img src="https://images.unsplash.com/photo-1531403009284-440f080d1e12?q=80&w=500&auto=format&fit=crop" alt="Explore">
+                    <div class="explore-overlay">
+                        <span><i class="fa-solid fa-play"></i> 44.5K</span>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+
+    <div class="bottom-nav">
+        <a href="feed.html"><i class="fa-solid fa-house"></i></a>
+        <a href="search.html" class="active"><i class="fa-solid fa-magnifying-glass"></i></a>
+        <a href="upload.html"><i class="fa-solid fa-square-plus"></i></a>
+        <a href="reels.html"><i class="fa-solid fa-clapperboard"></i></a>
+        <a href="profile.html"><i class="fa-solid fa-user"></i></a>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCR3xMj0rcdC1jRQyGePjtO9rpd8k5Om3E",
+            authDomain: "thivashgram.firebaseapp.com",
+            projectId: "thivashgram",
+            storageBucket: "thivashgram.firebasestorage.app",
+            messagingSenderId: "515740477126",
+            appId: "1:515740477126:web:44605f2b80c50d86d799c7",
+            measurementId: "G-LE2M9GDKCT"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // ROUTER SECURE GUARD
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                window.location.href = "index.html";
+            }
+        });
+
+        // Search action simulator trigger
+        window.executeSearch = function(e) {
+            if (e.key === 'Enter') {
+                const query = document.getElementById('search-query').value;
+                if(query.trim() !== "") {
+                    alert("Searching Database for: " + query);
+                    // This space will later hook to Firestore lookup queries
+                }
+            }
+        }
+
+        // Logout routing execution
+        window.logoutUser = function() {
+            signOut(auth).then(() => {
+                window.location.href = "index.html";
+            });
+        }
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,351 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ThivashGram - Notifications</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #0b0c10;
+            color: #ffffff;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* --- DESKTOP SIDEBAR --- */
+        .sidebar {
+            width: 250px;
+            background-color: #12131c;
+            border-right: 1px solid #1f2029;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 10;
+        }
+
+        .brand-logo {
+            font-size: 2rem;
+            font-weight: bold;
+            font-style: italic;
+            background: linear-gradient(45deg, #f72585, #7209b7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 40px;
+            padding-left: 10px;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 15px;
+            color: #a5a7b4;
+            text-decoration: none;
+            font-size: 1.05rem;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background-color: #1c1d27;
+            color: #f72585;
+        }
+
+        .nav-item i {
+            font-size: 1.2rem;
+            width: 25px;
+        }
+
+        .logout-btn {
+            margin-top: auto;
+            color: #f72585;
+            cursor: pointer;
+        }
+
+        /* --- MAIN CONTENT AREA --- */
+        .main-content {
+            margin-left: 250px;
+            flex: 1;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .notifications-container {
+            width: 100%;
+            max-width: 650px;
+        }
+
+        .page-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid #1f2029;
+            padding-bottom: 15px;
+        }
+
+        /* --- NOTIFICATION LIST ITEM --- */
+        .notification-list {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .notification-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #12131c;
+            border: 1px solid #1f2029;
+            padding: 15px 20px;
+            border-radius: 10px;
+            transition: background-color 0.2s;
+        }
+
+        .notification-item:hover {
+            background-color: #1c1d27;
+        }
+
+        .notif-left-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex: 1;
+        }
+
+        .user-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid #2a2c3d;
+        }
+
+        .notif-text-wrapper {
+            font-size: 0.9rem;
+            color: #e2e2e5;
+            line-height: 1.4;
+        }
+
+        .notif-text-wrapper strong {
+            color: #ffffff;
+            cursor: pointer;
+        }
+
+        .notif-time {
+            color: #7d7f8a;
+            font-size: 0.8rem;
+            margin-left: 5px;
+        }
+
+        /* --- ACTION RIGHT INTERFACES --- */
+        .btn-action-wrapper {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-accept {
+            background: linear-gradient(135deg, #7209b7, #560bad);
+            color: #ffffff;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-delete {
+            background-color: #1c1d27;
+            color: #ffffff;
+            border: 1px solid #2a2c3d;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .post-preview-thumbnail {
+            width: 40px;
+            height: 40px;
+            border-radius: 4px;
+            object-fit: cover;
+            cursor: pointer;
+        }
+
+        /* --- MOBILE BOTTOM NAV --- */
+        .bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #12131c;
+            border-top: 1px solid #1f2029;
+            justify-content: space-around;
+            padding: 12px 0;
+            z-index: 100;
+        }
+
+        .bottom-nav a {
+            color: #a5a7b4;
+            font-size: 1.3rem;
+            text-decoration: none;
+        }
+
+        .bottom-nav a.active {
+            color: #f72585;
+        }
+
+        /* --- RESPONSIVE DESIGN --- */
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            .main-content {
+                margin-left: 0;
+                padding: 15px;
+                padding-bottom: 80px;
+            }
+            .bottom-nav {
+                display: flex;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <div class="brand-logo">ThivashGram</div>
+        <ul class="nav-links">
+            <li><a href="feed.html" class="nav-item"><i class="fa-solid fa-house"></i> Home Feed</a></li>
+            <li><a href="search.html" class="nav-item"><i class="fa-solid fa-magnifying-glass"></i> Search</a></li>
+            <li><a href="reels.html" class="nav-item"><i class="fa-solid fa-clapperboard"></i> Reels</a></li>
+            <li><a href="messages.html" class="nav-item"><i class="fa-solid fa-paper-plane"></i> Messages</a></li>
+            <li><a href="notifications.html" class="nav-item active"><i class="fa-solid fa-heart"></i> Notifications</a></li>
+            <li><a href="upload.html" class="nav-item"><i class="fa-solid fa-square-plus"></i> Create Post</a></li>
+            <li><a href="profile.html" class="nav-item"><i class="fa-solid fa-user"></i> Profile</a></li>
+            <li><a href="settings.html" class="nav-item"><i class="fa-solid fa-gear"></i> Settings</a></li>
+            <li><a onclick="logoutUser()" class="nav-item logout-btn"><i class="fa-solid fa-right-from-bracket"></i> Log Out</a></li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        <div class="notifications-container">
+            <div class="page-title">
+                <i class="fa-solid fa-heart"></i> Notifications
+            </div>
+
+            <div class="notification-list">
+                
+                <div class="notification-item" id="notif-row-1">
+                    <div class="notif-left-content">
+                        <img src="https://via.placeholder.com/150" class="user-avatar" alt="User">
+                        <div class="notif-text-wrapper">
+                            <strong>skate_pro</strong> requested to follow you. <span class="notif-time">2h</span>
+                        </div>
+                    </div>
+                    <div class="btn-action-wrapper" id="action-block-1">
+                        <button class="btn-accept" onclick="respondFollow(1, 'accept')">Accept</button>
+                        <button class="btn-delete" onclick="respondFollow(1, 'delete')">Delete</button>
+                    </div>
+                </div>
+
+                <div class="notification-item">
+                    <div class="notif-left-content">
+                        <img src="https://via.placeholder.com/150" class="user-avatar" alt="User">
+                        <div class="notif-text-wrapper">
+                            <strong>football_life</strong> liked your post. <span class="notif-time">4h</span>
+                        </div>
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=150" class="post-preview-thumbnail" alt="Post Target">
+                </div>
+
+                <div class="notification-item">
+                    <div class="notif-left-content">
+                        <img src="https://via.placeholder.com/150" class="user-avatar" alt="User">
+                        <div class="notif-text-wrapper">
+                            <strong>nature_explorer</strong> commented: "Incredible shot macha! 🔥" <span class="notif-time">1d</span>
+                        </div>
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1517649763962-0c623066013b?q=80&w=150" class="post-preview-thumbnail" alt="Post Target">
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <div class="bottom-nav">
+        <a href="feed.html"><i class="fa-solid fa-house"></i></a>
+        <a href="search.html"><i class="fa-solid fa-magnifying-glass"></i></a>
+        <a href="upload.html"><i class="fa-solid fa-square-plus"></i></a>
+        <a href="reels.html"><i class="fa-solid fa-clapperboard"></i></a>
+        <a href="profile.html"><i class="fa-solid fa-user"></i></a>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCR3xMj0rcdC1jRQyGePjtO9rpd8k5Om3E",
+            authDomain: "thivashgram.firebaseapp.com",
+            projectId: "thivashgram",
+            storageBucket: "thivashgram.firebasestorage.app",
+            messagingSenderId: "515740477126",
+            appId: "1:515740477126:web:44605f2b80c50d86d799c7",
+            measurementId: "G-LE2M9GDKCT"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // ROUTER SECURE GUARD
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                window.location.href = "index.html";
+            }
+        });
+
+        // Click Follow Action Trigger logic simulation
+        window.respondFollow = function(rowId, action) {
+            const actionBlock = document.getElementById(`action-block-${rowId}`);
+            if(action === 'accept') {
+                actionBlock.innerHTML = `<span style="color: #7d7f8a; font-size: 0.85rem; font-weight:600;">Following</span>`;
+            } else {
+                document.getElementById(`notif-row-${rowId}`).style.display = 'none';
+            }
+            // Later hooks can connect this update dynamically into Firestore maps
+        }
+
+        // Global signout pipeline
+        window.logoutUser = function() {
+            signOut(auth).then(() => {
+                window.location.href = "index.html";
+            });
+        }
+    </script>
+</body>
+</html>
+

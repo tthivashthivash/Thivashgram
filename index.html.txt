@@ -1,0 +1,264 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ThivashGram - Login & Register</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #0b0c10;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .auth-container {
+            background-color: #12131c;
+            border: 1px solid #1f2029;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 400px;
+            padding: 40px 30px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+
+        .brand-logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            font-style: italic;
+            background: linear-gradient(45deg, #f72585, #7209b7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            color: #7d7f8a;
+            font-size: 0.9rem;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: #a5a7b4;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group input {
+            width: 100%;
+            background-color: #1c1d27;
+            border: 1px solid #2a2c3d;
+            border-radius: 8px;
+            padding: 14px;
+            color: #ffffff;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            border-color: #7209b7;
+        }
+
+        .btn-auth {
+            width: 100%;
+            background: linear-gradient(135deg, #7209b7, #560bad);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 14px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: opacity 0.3s;
+        }
+
+        .btn-auth:hover {
+            opacity: 0.9;
+        }
+
+        .switch-mode {
+            margin-top: 25px;
+            font-size: 0.9rem;
+            color: #a5a7b4;
+        }
+
+        .switch-mode a {
+            color: #f72585;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .switch-mode a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            background-color: rgba(247, 37, 133, 0.1);
+            border: 1px solid #f72585;
+            color: #f72585;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            margin-bottom: 20px;
+            display: none;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="auth-container">
+        <div class="brand-logo">ThivashGram</div>
+        <div id="form-subtitle" class="subtitle">Sign in to continue sharing your moments.</div>
+
+        <div id="error-box" class="error-message"></div>
+
+        <form id="auth-form" onsubmit="handleAuth(event)">
+            <div class="form-group" id="username-group" style="display: none;">
+                <label for="username">Username</label>
+                <input type="text" id="username" placeholder="Choose a unique username">
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" placeholder="Enter your email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Enter your password" required>
+            </div>
+
+            <button type="submit" id="submit-btn" class="btn-auth">Log In</button>
+        </form>
+
+        <div class="switch-mode" id="toggle-footer">
+            Don't have an account? <a onclick="toggleMode(true)">Create new account</a>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        // Your Exact Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCR3xMj0rcdC1jRQyGePjtO9rpd8k5Om3E",
+            authDomain: "thivashgram.firebaseapp.com",
+            projectId: "thivashgram",
+            storageBucket: "thivashgram.firebasestorage.app",
+            messagingSenderId: "515740477126",
+            appId: "1:515740477126:web:44605f2b80c50d86d799c7",
+            measurementId: "G-LE2M9GDKCT"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // State tracker: false = Login Mode, true = Register Mode
+        let isRegisterMode = false;
+
+        // Global functions binding so HTML buttons can use them
+        window.toggleMode = function(registerMode) {
+            isRegisterMode = registerMode;
+            const errorBox = document.getElementById('error-box');
+            const usernameGroup = document.getElementById('username-group');
+            const submitBtn = document.getElementById('submit-btn');
+            const subtitle = document.getElementById('form-subtitle');
+            const footer = document.getElementById('toggle-footer');
+            const usernameInput = document.getElementById('username');
+
+            errorBox.style.display = 'none';
+
+            if (isRegisterMode) {
+                subtitle.innerText = "Create an account to get started.";
+                usernameGroup.style.display = 'block';
+                usernameInput.required = true;
+                submitBtn.innerText = "Sign Up";
+                footer.innerHTML = `Already have an account? <a onclick="toggleMode(false)">Log In</a>`;
+            } else {
+                subtitle.innerText = "Sign in to continue sharing your moments.";
+                usernameGroup.style.display = 'none';
+                usernameInput.required = false;
+                submitBtn.innerText = "Log In";
+                footer.innerHTML = `Don't have an account? <a onclick="thoughtToggleMode(true)">Create new account</a>`;
+            }
+        }
+        // Workaround for innerHTML template string binding
+        window.thoughtToggleMode = window.toggleMode;
+
+        // Authentication Submission Handler
+        window.handleAuth = function(event) {
+            event.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const username = document.getElementById('username').value;
+            const errorBox = document.getElementById('error-box');
+
+            errorBox.style.display = 'none';
+
+            if (isRegisterMode) {
+                // Handle Firebase Sign Up
+                createUserWithEmailAndPassword(auth, email, password)
+                    .then((userCredential) => {
+                        const user = userCredential.user;
+                        // Save the user's custom username inside Firebase Auth Profile
+                        updateProfile(user, {
+                            displayName: username
+                        }).then(() => {
+                            // Successfully registered and redirected to Feed Page
+                            window.location.href = "feed.html";
+                        });
+                    })
+                    .catch((error) => {
+                        errorBox.innerText = error.message.replace("Firebase: ", "");
+                        errorBox.style.display = 'block';
+                    });
+            } else {
+                // Handle Firebase Login
+                signInWithEmailAndPassword(auth, email, password)
+                    .then((userCredential) => {
+                        // Successfully authenticated and redirected to Feed Page
+                        window.location.href = "feed.html";
+                    })
+                    .catch((error) => {
+                        errorBox.innerText = "Invalid credentials. Please try again.";
+                        errorBox.style.display = 'block';
+                    });
+            }
+        }
+
+        // Security Guard: If user is already logged in, automatically push them to Feed Page
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                window.location.href = "feed.html";
+            }
+        });
+    </script>
+</body>
+</html>
+

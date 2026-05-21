@@ -1,0 +1,448 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ThivashGram - Messages</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #0b0c10;
+            color: #ffffff;
+            display: flex;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- DESKTOP SIDEBAR --- */
+        .sidebar {
+            width: 250px;
+            background-color: #12131c;
+            border-right: 1px solid #1f2029;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 10;
+        }
+
+        .brand-logo {
+            font-size: 2rem;
+            font-weight: bold;
+            font-style: italic;
+            background: linear-gradient(45deg, #f72585, #7209b7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 40px;
+            padding-left: 10px;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 15px;
+            color: #a5a7b4;
+            text-decoration: none;
+            font-size: 1.05rem;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background-color: #1c1d27;
+            color: #f72585;
+        }
+
+        .nav-item i {
+            font-size: 1.2rem;
+            width: 25px;
+        }
+
+        .logout-btn {
+            margin-top: auto;
+            color: #f72585;
+            cursor: pointer;
+        }
+
+        /* --- DM WORKSPACE AREA --- */
+        .main-content {
+            margin-left: 250px;
+            flex: 1;
+            height: 100vh;
+            display: flex;
+            background-color: #050508;
+        }
+
+        /* Left Side Chat User List */
+        .chat-sidebar {
+            width: 350px;
+            background-color: #12131c;
+            border-right: 1px solid #1f2029;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-sidebar-header {
+            padding: 24px 20px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border-bottom: 1px solid #1f2029;
+        }
+
+        .chat-list {
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .chat-user-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            border-bottom: 1px solid rgba(31, 32, 41, 0.5);
+        }
+
+        .chat-user-item:hover, .chat-user-item.active {
+            background-color: #1c1d27;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid #2a2c3d;
+        }
+
+        .user-chat-details {
+            flex: 1;
+        }
+
+        .user-chat-details .chat-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+        }
+
+        .user-chat-details .last-msg {
+            font-size: 0.8rem;
+            color: #7d7f8a;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 200px;
+        }
+
+        /* Right Side Chat Dialogue Window */
+        .chat-window {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: #0b0c10;
+        }
+
+        .chat-window-header {
+            padding: 15px 20px;
+            background-color: #12131c;
+            border-bottom: 1px solid #1f2029;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .chat-window-header .active-name {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        /* Messages Stream Bubble Box */
+        .chat-messages-stream {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .msg-bubble {
+            max-width: 65%;
+            padding: 12px 16px;
+            border-radius: 14px;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+
+        .msg-bubble.incoming {
+            background-color: #12131c;
+            color: #ffffff;
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+            border: 1px solid #1f2029;
+        }
+
+        .msg-bubble.outgoing {
+            background: linear-gradient(135deg, #7209b7, #560bad);
+            color: #ffffff;
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
+        }
+
+        /* Bottom Control Action Input */
+        .chat-input-area {
+            padding: 20px;
+            background-color: #12131c;
+            border-top: 1px solid #1f2029;
+        }
+
+        .chat-input-form {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .chat-text-field {
+            flex: 1;
+            background-color: #1c1d27;
+            border: 1px solid #2a2c3d;
+            border-radius: 25px;
+            padding: 12px 20px;
+            color: #ffffff;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .chat-text-field:focus {
+            border-color: #7209b7;
+        }
+
+        .btn-send-msg {
+            background: linear-gradient(45deg, #f72585, #7209b7);
+            color: white;
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: transform 0.2s;
+        }
+
+        .btn-send-msg:hover {
+            transform: scale(1.05);
+        }
+
+        /* --- MOBILE BOTTOM NAV --- */
+        .bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #12131c;
+            border-top: 1px solid #1f2029;
+            justify-content: space-around;
+            padding: 12px 0;
+            z-index: 100;
+        }
+
+        .bottom-nav a {
+            color: #a5a7b4;
+            font-size: 1.3rem;
+            text-decoration: none;
+        }
+
+        .bottom-nav a.active {
+            color: #f72585;
+        }
+
+        /* --- RESPONSIVE DESIGN --- */
+        @media (max-width: 900px) {
+            .chat-sidebar {
+                width: 80px;
+            }
+            .chat-sidebar-header, .user-chat-details {
+                display: none;
+            }
+            .chat-user-item {
+                justify-content: center;
+                padding: 15px 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            .main-content {
+                margin-left: 0;
+                height: calc(100vh - 55px);
+            }
+            .bottom-nav {
+                display: flex;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <div class="brand-logo">ThivashGram</div>
+        <ul class="nav-links">
+            <li><a href="feed.html" class="nav-item"><i class="fa-solid fa-house"></i> Home Feed</a></li>
+            <li><a href="search.html" class="nav-item"><i class="fa-solid fa-magnifying-glass"></i> Search</a></li>
+            <li><a href="reels.html" class="nav-item"><i class="fa-solid fa-clapperboard"></i> Reels</a></li>
+            <li><a href="messages.html" class="nav-item active"><i class="fa-solid fa-paper-plane"></i> Messages</a></li>
+            <li><a href="notifications.html" class="nav-item"><i class="fa-solid fa-heart"></i> Notifications</a></li>
+            <li><a href="upload.html" class="nav-item"><i class="fa-solid fa-square-plus"></i> Create Post</a></li>
+            <li><a href="profile.html" class="nav-item"><i class="fa-solid fa-user"></i> Profile</a></li>
+            <li><a href="settings.html" class="nav-item"><i class="fa-solid fa-gear"></i> Settings</a></li>
+            <li><a onclick="logoutUser()" class="nav-item logout-btn"><i class="fa-solid fa-right-from-bracket"></i> Log Out</a></li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        
+        <div class="chat-sidebar">
+            <div class="chat-sidebar-header">Messages</div>
+            <div class="chat-list">
+                
+                <div class="chat-user-item active" onclick="switchActiveChat('football_life', 'https://via.placeholder.com/150')">
+                    <img src="https://via.placeholder.com/150" class="user-avatar" alt="User">
+                    <div class="user-chat-details">
+                        <div class="chat-name">football_life</div>
+                        <div class="last-msg">Macha match timing enna? ⚽</div>
+                    </div>
+                </div>
+
+                <div class="chat-user-item" onclick="switchActiveChat('skate_pro', 'https://via.placeholder.com/150')">
+                    <img src="https://via.placeholder.com/150" class="user-avatar" alt="User">
+                    <div class="user-chat-details">
+                        <div class="chat-name">skate_pro</div>
+                        <div class="last-msg">That video edit was insane bro! 🔥</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="chat-window">
+            <div class="chat-window-header">
+                <img src="https://via.placeholder.com/150" id="active-chat-avatar" class="user-avatar" alt="User">
+                <div class="active-name" id="active-chat-username">football_life</div>
+            </div>
+
+            <div class="chat-messages-stream" id="messages-stream-box">
+                <div class="msg-bubble incoming">Hey bro! default theme veriytanama iruku structural-ah!</div>
+                <div class="msg-bubble outgoing">Thanks macha! Working on Firebase messaging setup now.</div>
+                <div class="msg-bubble incoming">Awesome. Macha match timing enna? ⚽</div>
+            </div>
+
+            <div class="chat-input-area">
+                <form class="chat-input-form" onsubmit="transmitLocalMessage(event)">
+                    <input type="text" class="chat-text-field" id="message-input-text" placeholder="Message..." autocomplete="off">
+                    <button type="submit" class="btn-send-msg"><i class="fa-solid fa-paper-plane"></i></button>
+                </form>
+            </div>
+        </div>
+
+    </main>
+
+    <div class="bottom-nav">
+        <a href="feed.html"><i class="fa-solid fa-house"></i></a>
+        <a href="search.html"><i class="fa-solid fa-magnifying-glass"></i></a>
+        <a href="upload.html"><i class="fa-solid fa-square-plus"></i></a>
+        <a href="reels.html"><i class="fa-solid fa-clapperboard"></i></a>
+        <a href="profile.html"><i class="fa-solid fa-user"></i></a>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCR3xMj0rcdC1jRQyGePjtO9rpd8k5Om3E",
+            authDomain: "thivashgram.firebaseapp.com",
+            projectId: "thivashgram",
+            storageBucket: "thivashgram.firebasestorage.app",
+            messagingSenderId: "515740477126",
+            appId: "1:515740477126:web:44605f2b80c50d86d799c7",
+            measurementId: "G-LE2M9GDKCT"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // ROUTER GUARD
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                window.location.href = "index.html";
+            }
+        });
+
+        // Local Chat Box Rendering Logic
+        window.transmitLocalMessage = function(event) {
+            event.preventDefault();
+            const inputElement = document.getElementById('message-input-text');
+            const streamBox = document.getElementById('messages-stream-box');
+            
+            if (inputElement.value.trim() === "") return;
+
+            // Generate outgoing bubble
+            const bubble = document.createElement('div');
+            bubble.className = "msg-bubble outgoing";
+            bubble.innerText = inputElement.value;
+            
+            streamBox.appendChild(bubble);
+            inputElement.value = ""; // Clear Input
+            
+            // Auto scroll to bottom
+            streamBox.scrollTop = streamBox.scrollHeight;
+        }
+
+        // Active state context switcher switcher 
+        window.switchActiveChat = function(username, avatarUrl) {
+            document.getElementById('active-chat-username').innerText = username;
+            document.getElementById('active-chat-avatar').src = avatarUrl;
+            
+            // Remove active classes and switch highlight
+            const items = document.querySelectorAll('.chat-user-item');
+            items.forEach(i => i.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            
+            alert(`Chat switched to ${username}! Connecting to firestore message collections soon.`);
+        }
+
+        // Logout Process routine
+        window.logoutUser = function() {
+            signOut(auth).then(() => {
+                window.location.href = "index.html";
+            });
+        }
+    </script>
+</body>
+</html>
+
